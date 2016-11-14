@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <limits.h>
+#include <regex>
 
 using namespace std;
 
@@ -145,6 +146,12 @@ void tokenizeAndWrite(ofstream& outputFile, string token)
 	while(it != tokens.end())
 	{
 		string temp = *it;
+		temp = regex_replace(temp, regex("\\s+"), string(""));
+		if(temp.size() == 0)
+		{
+			it++;
+			continue;
+		}
 		if(isKeyword(temp) && !stringFlag)
 		{
 			outputFile << "<keyword> " << *it << " </keyword>\r\n";
@@ -209,6 +216,12 @@ void tokenizeAndWrite(ofstream& outputFile, string token)
 							i += 6;
 							continue;
 						}
+						if(!string("false)").compare(string(temp.begin() + i, temp.begin() + i + 6)))
+						{
+							outputFile << "<keyword> false </keyword>\r\n<symbol> ; </symbol>\r\n";
+							i += 6;
+							continue;
+						}
 					}
 					if(temp.size() >= 5)
 					{
@@ -225,6 +238,24 @@ void tokenizeAndWrite(ofstream& outputFile, string token)
 							continue;
 						}
 						if(!string("this;").compare(string(temp.begin() + i, temp.begin() + i + 5)))
+						{
+							outputFile << "<keyword> this </keyword>\r\n<symbol> ; </symbol>\r\n";
+							i += 5;
+							continue;
+						}
+						if(!string("true)").compare(string(temp.begin() + i, temp.begin() + i + 5)))
+						{
+							outputFile << "<keyword> true </keyword>\r\n<symbol> ; </symbol>\r\n";
+							i += 5;
+							continue;
+						}
+						if(!string("null)").compare(string(temp.begin() + i, temp.begin() + i + 5)))
+						{
+							outputFile << "<keyword> null </keyword>\r\n<symbol> ; </symbol>\r\n";
+							i += 5;
+							continue;
+						}
+						if(!string("this)").compare(string(temp.begin() + i, temp.begin() + i + 5)))
 						{
 							outputFile << "<keyword> this </keyword>\r\n<symbol> ; </symbol>\r\n";
 							i += 5;
